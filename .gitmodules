@@ -1,0 +1,6 @@
+[submodule "submodules/micropython-i2c-lcd"]
+	path = submodules/micropython-i2c-lcd
+	url = https://github.com/croqueue/micropython-i2c-lcd.git
+[submodule "submodules/micropython-rotary"]
+	path = submodules/micropython-rotary
+	url = https://github.com/croqueue/micropython-rotary.git
