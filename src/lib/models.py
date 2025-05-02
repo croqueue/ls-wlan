@@ -1,4 +1,5 @@
 from binascii import hexlify
+from typing import Iterator, List
 
 # [ ] 0123456789AB
 # [ ] BA9876543210
@@ -48,10 +49,30 @@ class WiFiNetwork:
     def is_hidden(self) -> bool:
         return self._hidden
 
-_SECURITY_TABLE = [
+class WiFiNetworkCache:
+    def __init__(self, wlan_data_list: List[tuple]):
+        self._table = [WiFiNetwork(n) for n in wlan_data_list]
+    
+    def __len__(self) -> int:
+        return len(self._table)
+    
+    def __getitem__(self, i: int) -> WiFiNetwork:
+        return self._table[i]
+
+    def addresses(self) -> Iterator[str]:
+        for n in self._table:
+            yield str(n)
+    
+
+
+
+
+# STATIC DATA
+
+_SECURITY_TABLE = const([
     'None',
     'WEP',
     'WPA-PSK',
     'WPA2-PSK',
     'WPA/WPA2-PSK'
-]
+])
