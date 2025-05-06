@@ -4,7 +4,6 @@ import utime
 import machine
 from machine_i2c_lcd import I2cLcd
 from rotary_irq_rp2 import RotaryIRQ
-from controllers import DeviceController
 
 rotary_encoder = rotary_encoder = RotaryIRQ(
     15,     # clock pin
@@ -36,11 +35,19 @@ def on_encoder_pos_change():
 
 def main() -> None:
     lcd_screen.backlight_on()
-    nic = boot_nic(lcd_screen)
-    ctl = DeviceController(lcd_screen, rotary_encoder, nic)
-    ctl.scan_for_networks()
     lcd_screen.show_cursor()
     lcd_screen.blink_cursor_on()
+    rotary_encoder.add_listener(on_encoder_pos_change)
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        rotary_encoder.remove_listener(on_encoder_pos_change)
+        lcd_screen.blink_cursor_off()
+        lcd_screen.hide_cursor()
+        lcd_screen.backlight_off()
+    
+    print('we done here')
 
 
 

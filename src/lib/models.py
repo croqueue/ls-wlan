@@ -1,5 +1,4 @@
 from binascii import hexlify
-from typing import Iterator, List
 
 # [ ] 0123456789AB
 # [ ] BA9876543210
@@ -12,11 +11,10 @@ from typing import Iterator, List
 # [ ] SECURITY
 # [ ] HIDDEN
 
-
 class WiFiNetwork:
     def __init__(self, wlan_data: tuple):
         self._ssid: str = wlan_data[0].decode('utf-8')
-        self._hw_addr: str = hexlify(wlan_data[1]).decode('utf-8')
+        self._hw_addr: str = hexlify(wlan_data[1]).decode('utf-8').upper()
         self._channel = wlan_data[2]
         self._rssi: int = wlan_data[3]
         self._security: str = _SECURITY_TABLE[wlan_data[4]]
@@ -50,7 +48,7 @@ class WiFiNetwork:
         return self._hidden
 
 class WiFiNetworkCache:
-    def __init__(self, wlan_data_list: List[tuple]):
+    def __init__(self, wlan_data_list: list):
         self._table = [WiFiNetwork(n) for n in wlan_data_list]
     
     def __len__(self) -> int:
@@ -59,7 +57,7 @@ class WiFiNetworkCache:
     def __getitem__(self, i: int) -> WiFiNetwork:
         return self._table[i]
 
-    def addresses(self) -> Iterator[str]:
+    def addresses(self):
         for n in self._table:
             yield str(n)
     
@@ -69,10 +67,22 @@ class WiFiNetworkCache:
 
 # STATIC DATA
 
-_SECURITY_TABLE = const([
-    'None',
-    'WEP',
-    'WPA-PSK',
-    'WPA2-PSK',
-    'WPA/WPA2-PSK'
-])
+# _SECURITY_TABLE = (
+#     'None',
+#     'WEP',
+#     'WPA-PSK',
+#     'WPA2-PSK',
+#     'WPA/WPA2-PSK',
+#     'IDK'
+# )
+
+_SECURITY_TABLE = (
+    'Open',     # 0
+    'WEP',  # 1
+    'WPA',      # 2
+    'WPA + WEP',         # 3
+    'WPA2',         # 4
+    'WPA2 + WEP',         # 5
+    'WPA/WPA2',         # 6
+    'WPA/WPA2 + WEP',         # 7
+)
