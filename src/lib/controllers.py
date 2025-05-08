@@ -4,34 +4,64 @@ from machine_i2c_lcd import I2cLcd
 from rotary_irq_rp2 import RotaryIRQ
 from models import WiFiNetwork
 from views import ViewBase, MainView, NetworkDetailsView, DataView, NETWORK_PROP_NAMES
+from network import WLAN
 
 # _NETWORK_PROP_MAP = {nm: i for i, nm in enumerate(NETWORK_PROP_NAMES)}
 
 class ControllerBase:
-    def __init__(self, view: ViewBase, lcd: I2cLcd):
+    def __init__(self, lcd: I2cLcd):
         self._lcd = lcd
-        self._view = view
     
     def increment_opt(self) -> None:
         self._view.current_opt += 1
     
     def decrement_opt(self) -> None:
         self._view.current_opt -= 1
-    
-
-
 
 class MainController(ControllerBase):
-    def __init__(self, view: MainView, lcd: I2cLcd):
-        super().__init__(view, lcd)
+    def __init__(self, lcd: I2cLcd, network_list: list):
+        super().__init__(lcd)
+        self._view = MainView(self._lcd, network_list)
 
 class NetworkDetailsController(ControllerBase):
     def __init__(self, view: NetworkDetailsView, lcd: I2cLcd):
         super().__init__(view, lcd)
 
 class DataController(ControllerBase):
-    def __init__(self, view: DataView, lcd: I2cLcd, re: RotaryIRQ):
-        super().__init__(view, lcd, re)
+    def __init__(self, view: DataView, lcd: I2cLcd):
+        super().__init__(view, lcd)
+
+_ACTIVE_CTL = None
+_RE_LAST_VAL: int = 0
+_RE = None
+
+def _re_listener():
+    value = _RE.value()
+    if value - _RE_LAST_VAL > 0:
+        _ACTIVE_CTL.increment_opt()
+    else:
+        _ACTIVE_CTL.decrement_opt()
+    
+    _RE_LAST_VAL = value
+
+class UserController:
+    def __init__(self, lcd: I2cLcd, re: RotaryIRQ):
+        self._lcd = lcd
+
+        self._nic = WLAN(WLAN.IF_STA)
+        self._nic.active(True)
+        network_list = self._nic.scan()
+
+        _RE = re
+        _RE.add_listener(_re_listener)
+        _RE.set(min_val=0,
+                max_val=len(network_list) - 1,
+                incr=1,
+                range_mode=RotaryIRQ.RANGE_BOUNDED)
+        
+        _ACTIVE_CTL = MainController(self._lcd, network_list)
+
+
 
 
 
