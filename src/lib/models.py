@@ -46,6 +46,17 @@ class WiFiNetwork:
     @property
     def is_hidden(self) -> bool:
         return self._hidden
+    
+    @property
+    def data(self) -> tuple:
+        return (
+            ('SSID', self._ssid),
+            ('HW ADDRESS', self._hw_addr),
+            ('CHANNEL', self._channel),
+            ('RSSI', self._rssi),
+            ('SECURITY', self._security),
+            ('HIDDEN?', str(self._hidden))
+        )
 
 class WiFiNetworkCache:
     def __init__(self, wlan_data_list: list):
@@ -60,7 +71,6 @@ class WiFiNetworkCache:
     def addresses(self):
         for n in self._table:
             yield str(n)
-    
 
 
 
