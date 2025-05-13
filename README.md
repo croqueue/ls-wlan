@@ -1,4 +1,4 @@
-![wlansies](https://github.com/islandu/wlansies/blob/main/.github/images/mascot.png)
+![wlansies](https://github.com/croqueue/wlansies/blob/main/.github/images/mascot.png)
 
 # wlansies
 Scan for WiFi networks in your area with about $10 USD worth of hardware (Raspberry Pi Pico W, 16x2 LCD screen, rotary encoder).
